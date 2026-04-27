@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>SMP Market</title>
+
+<style>
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #0f172a;
+  color: white;
+}
+
+/* ヘッダー */
+header {
+  padding: 20px;
+  font-size: 20px;
+  font-weight: bold;
+  background: rgba(255,255,255,0.05);
+  backdrop-filter: blur(10px);
+}
+
+/* グリッド */
+.container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 15px;
+  padding: 20px;
+}
+
+/* カード */
+.card {
+  background: rgba(255,255,255,0.06);
+  border-radius: 12px;
+  padding: 15px;
+  transition: 0.2s;
+  cursor: pointer;
+  border: 1px solid rgba(255,255,255,0.08);
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  background: rgba(56,189,248,0.15);
+  border-color: #38bdf8;
+}
+
+/* ボタン */
+button {
+  margin-top: 10px;
+  padding: 8px 12px;
+  border: none;
+  border-radius: 8px;
+  background: #38bdf8;
+  color: black;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+button:hover {
+  opacity: 0.85;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+SMP Market
+</header>
+
+<div class="container">
+
+  <div class="card" onclick="playClick()">
+    <h3>Diamond Sword</h3>
+    <p>Price: 1200 coins</p>
+    <p>Seller: Steve</p>
+    <button onclick="buy(event)">Buy</button>
+  </div>
+
+  <div class="card" onclick="playClick()">
+    <h3>Netherite Armor</h3>
+    <p>Price: 5000 coins</p>
+    <p>Seller: Alex</p>
+    <button onclick="buy(event)">Buy</button>
+  </div>
+
+</div>
+
+<audio id="clickSound" src="click.mp3"></audio>
+
+<script>
+function playClick(){
+  const sound = document.getElementById("clickSound");
+  sound.currentTime = 0;
+  sound.play();
+}
+
+function buy(e){
+  e.stopPropagation();
+  playClick();
+  alert("Transaction started");
+}
+</script>
+
+</body>
+</html>
