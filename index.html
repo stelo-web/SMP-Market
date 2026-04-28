@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Donut Exchange | Minecraft Marketplace</title>
+    <title>Donut Exchange | Minecraft Market</title>
     <style>
         /* --- Minecraft Theme Core --- */
         @font-face {
@@ -12,7 +12,7 @@
         }
 
         :root {
-            --mc-bg: #48494a;
+            --mc-bg: #1a1a1a;
             --mc-panel: #c6c6c6;
             --mc-panel-shadow: #555555;
             --mc-panel-light: #ffffff;
@@ -24,266 +24,205 @@
             --mc-gold: #ffaa00;
         }
 
-        * {
-            box-sizing: border-box;
-            image-rendering: pixelated;
-        }
-
+        * { box-sizing: border-box; image-rendering: pixelated; }
         body {
-            background-color: #1a1a1a;
-            background-image: url('https://www.transparenttextures.com/patterns/dark-matter.png'); /* Dirt/Stone base */
+            background-color: var(--mc-bg);
+            background-image: url('https://www.transparenttextures.com/patterns/dark-matter.png');
             color: white;
-            font-family: 'Minecraftia', 'MS Gothic', sans-serif;
+            font-family: 'Minecraftia', sans-serif;
             margin: 0;
-            padding: 0;
+            overflow-x: hidden;
             display: flex;
             flex-direction: column;
             align-items: center;
+            min-height: 100vh;
         }
 
-        /* --- UI Components --- */
-        .mc-container {
-            width: 100%;
-            max-width: 500px;
-            padding: 20px;
-            padding-bottom: 100px;
-        }
+        /* --- Layout --- */
+        .page { display: none; width: 100%; max-width: 500px; padding: 20px 20px 120px 20px; animation: fadeIn 0.2s; }
+        .page.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        .mc-header {
-            text-align: center;
-            margin-bottom: 20px;
-            border-bottom: 4px solid var(--mc-panel-shadow);
-            padding-bottom: 10px;
-        }
-
-        .mc-title {
-            font-size: 24px;
-            color: var(--mc-gold);
-            text-shadow: var(--mc-text-shadow);
-            margin: 0;
-        }
-
-        /* 信頼スコアセクション */
+        /* --- MC Components --- */
         .mc-card {
             background-color: var(--mc-panel);
             border: 4px solid;
             border-color: var(--mc-panel-light) var(--mc-panel-shadow) var(--mc-panel-shadow) var(--mc-panel-light);
-            padding: 15px;
-            color: #373737;
-            margin-bottom: 20px;
-            position: relative;
+            padding: 15px; color: #373737; margin-bottom: 20px;
         }
 
-        .mc-card-title {
-            margin: 0 0 10px 0;
-            font-size: 14px;
-            text-decoration: underline;
-        }
-
-        /* ボタン */
         .mc-button {
-            display: block;
-            width: 100%;
-            background-color: var(--mc-button);
-            border: 3px solid;
-            border-color: var(--mc-panel-light) var(--mc-button-border-dark) var(--mc-button-border-dark) var(--mc-panel-light);
-            padding: 10px;
-            color: white;
-            text-align: center;
-            text-shadow: var(--mc-text-shadow);
-            cursor: pointer;
-            margin-bottom: 10px;
-            text-decoration: none;
-            font-size: 14px;
+            display: block; width: 100%; background-color: var(--mc-button);
+            border: 3px solid; border-color: var(--mc-panel-light) var(--mc-button-border-dark) var(--mc-button-border-dark) var(--mc-panel-light);
+            padding: 12px; color: white; text-align: center; text-shadow: var(--mc-text-shadow);
+            cursor: pointer; margin-bottom: 10px; font-size: 14px; text-decoration: none;
         }
+        .mc-button:active { border-color: var(--mc-button-border-dark) var(--mc-panel-light) var(--mc-panel-light) var(--mc-button-border-dark); }
+        .mc-button.disabled { filter: grayscale(1); cursor: not-allowed; color: #888; }
 
-        .mc-button:hover {
-            background-color: var(--mc-button-hover);
-            border-color: #c6c6c6 #2a2a2a #2a2a2a #c6c6c6;
-        }
-
-        .mc-button.disabled {
-            filter: grayscale(1);
-            cursor: not-allowed;
-            color: #888;
-        }
-
-        /* アイテムスロット */
         .item-slot {
-            display: flex;
-            background-color: #8b8b8b;
-            border: 4px solid #373737;
-            border-right-color: #ffffff;
-            border-bottom-color: #ffffff;
-            margin-bottom: 10px;
-            padding: 10px;
-            align-items: center;
-            gap: 15px;
+            background-color: #8b8b8b; border: 4px solid #373737; border-right-color: #ffffff; border-bottom-color: #ffffff;
+            margin-bottom: 10px; padding: 10px; display: flex; align-items: center; gap: 15px; cursor: pointer;
         }
 
-        .item-icon {
-            width: 48px;
-            height: 48px;
-            background-color: #484848;
-            border: 2px solid #222;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .item-info h4 {
-            margin: 0;
-            font-size: 14px;
-            color: white;
-            text-shadow: 2px 2px 0 #000;
-        }
-
-        .price {
-            color: #55ff55;
-            text-shadow: 2px 2px 0 #00aa00;
-            font-size: 16px;
-        }
-
-        /* 詐欺師アラート */
-        .danger-alert {
-            border: 4px solid var(--mc-danger);
-            background-color: #2a0000;
-            color: var(--mc-danger);
-            padding: 10px;
-            font-size: 12px;
-            margin-top: 10px;
-        }
-
-        /* 下部ナビゲーション（Hotbar風） */
+        /* --- Navigation --- */
         .mc-hotbar {
-            position: fixed;
-            bottom: 10px;
-            background-color: rgba(0,0,0,0.5);
-            display: flex;
-            padding: 5px;
-            border: 4px solid #111;
-            gap: 5px;
+            position: fixed; bottom: 15px; background-color: rgba(0,0,0,0.6);
+            display: flex; padding: 4px; border: 4px solid #111; gap: 4px; z-index: 100;
         }
-
         .hotbar-slot {
-            width: 50px;
-            height: 50px;
-            background-color: #8b8b8b;
-            border: 4px solid #373737;
-            border-right-color: #ffffff;
-            border-bottom-color: #ffffff;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
+            width: 44px; height: 44px; background-color: #8b8b8b; border: 4px solid #373737;
+            border-right-color: #ffffff; border-bottom-color: #ffffff;
+            display: flex; align-items: center; justify-content: center; cursor: pointer;
         }
+        .hotbar-slot.active { border: 4px solid white; outline: 2px solid #000; z-index: 10; }
+        .hotbar-slot img { width: 28px; height: 28px; }
 
-        .hotbar-slot.active {
-            border: 4px solid white;
-            box-shadow: 0 0 10px white;
-            z-index: 10;
+        /* --- Progress Bar --- */
+        .xp-bar-bg { background-color: #222; height: 12px; border: 2px solid #555; margin: 10px 0; }
+        .xp-bar-fill { background-color: #55ff55; height: 100%; width: 0%; transition: width 1s linear; }
+
+        input, textarea {
+            width: 100%; background: #000; border: 2px solid #555; color: #55ff55;
+            padding: 10px; font-family: 'Minecraftia'; margin-bottom: 15px;
         }
-
-        .hotbar-slot img {
-            width: 32px;
-            height: 32px;
-        }
-
-        /* 進行状況バー */
-        .progress-bg {
-            background-color: #222;
-            height: 20px;
-            border: 2px solid #555;
-            margin: 10px 0;
-        }
-
-        .progress-fill {
-            background-color: #55ff55;
-            height: 100%;
-            width: 30%;
-        }
-
     </style>
 </head>
 <body>
 
-    <div class="mc-container">
-        <div class="mc-header">
-            <h1 class="mc-title">DONUT EXCHANGE</h1>
-            <p style="font-size: 10px; color: #aaa;">Signed in as Ifuto</p>
+    <div id="page-home" class="page active">
+        <h2 style="color: var(--mc-gold); text-shadow: var(--mc-text-shadow);">MARKET LIST</h2>
+        <div class="item-slot" onclick="navigate('item-detail')">
+            <img src="https://minecraft.wiki/images/Netherite_Ingot_JE2_BE2.png" width="32">
+            <div>
+                <div style="font-size: 12px;">Netherite Ingot x64</div>
+                <div style="color: #55ff55;">$1,200,000</div>
+            </div>
         </div>
+        <div class="item-slot" style="background-color: #4a1a1a;" onclick="alert('特別危険人物です。注意してください。'); navigate('item-detail')">
+            <img src="https://minecraft.wiki/images/Enchanted_Golden_Apple_JE2_BE2.gif" width="32">
+            <div>
+                <div style="font-size: 12px; color: var(--mc-danger);">Suspicious Apple</div>
+                <div style="color: #888; text-decoration: line-through;">$50,000</div>
+            </div>
+        </div>
+    </div>
 
+    <div id="page-item-detail" class="page">
+        <div class="mc-button" style="width: 80px; margin-bottom: 20px;" onclick="navigate('home')">← BACK</div>
         <div class="mc-card">
-            <h3 class="mc-card-title">STATUS: TRUSTED</h3>
-            <div style="display: flex; justify-content: space-between;">
-                <span>SCORE: <span style="color: #00aa00;">92%</span></span>
-                <span>UUID: <span style="color: #5555ff;">VALID</span></span>
-            </div>
-            <div class="danger-alert" style="border-color: #ffaa00; color: #ffaa00; background: #2a1a00;">
-                ⚠ Caution: 詐欺申請が1件進行中
-            </div>
-        </div>
-
-        <h3 style="text-shadow: var(--mc-text-shadow); font-size: 16px;">[ 最新の出品 ]</h3>
-        
-        <div class="item-slot">
-            <div class="item-icon">
-                <img src="https://minecraft.wiki/images/Netherite_Ingot_JE2_BE2.png" width="32">
-            </div>
-            <div class="item-info">
-                <h4>Netherite Ingot x64</h4>
-                <div class="price">$1,200,000</div>
-                <div style="font-size: 10px; color: #ccc;">Seller: Steve_Mine</div>
-            </div>
-        </div>
-
-        <div class="item-slot" style="background-color: #4a1a1a; border-color: #ff5555;">
-            <div class="item-icon" style="background-color: #2a0000;">
-                <img src="https://minecraft.wiki/images/Enchanted_Golden_Apple_JE2_BE2.gif" width="32">
-            </div>
-            <div class="item-info">
-                <h4 style="color: var(--mc-danger);">Special Danger Person</h4>
-                <div class="price" style="color: #888; text-decoration: line-through;">$50,000</div>
-                <div style="font-size: 10px; color: #ff5555;">Warning: リスク高</div>
-            </div>
-        </div>
-
-        <div class="mc-card" style="margin-top: 30px; background-color: #333; color: white; border-color: #555 #111 #111 #555;">
-            <h3 style="text-align: center; font-size: 14px;">取引プロトコル進行中</h3>
-            <div style="display: flex; justify-content: space-around; margin: 15px 0;">
-                <img src="https://mc-heads.net/avatar/Ifuto/40" style="border: 2px solid white;">
+            <h3 style="margin-top:0">TRANSACTION</h3>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin: 20px 0;">
+                <img src="https://mc-heads.net/avatar/Ifuto/40" style="border: 2px solid #555;">
                 <span style="font-size: 20px;">➡</span>
-                <img src="https://mc-heads.net/avatar/Alex/40" style="border: 2px solid white;">
+                <img src="https://mc-heads.net/avatar/Alex/40" style="border: 2px solid #555;">
             </div>
-            <p style="font-size: 10px; text-align: center;">完了ボタン有効化まであと 8:42</p>
-            <div class="progress-bg">
-                <div class="progress-fill"></div>
-            </div>
-            <div class="mc-button disabled">取引完了 (待機中)</div>
-        </div>
-
-        <div class="mc-button" style="background-color: #ff5555; margin-top: 10px;">
-            詐欺被害を報告する
+            <p style="font-size: 10px; text-align: center;">完了ボタン有効まで: <span id="timer-text">10:00</span></p>
+            <div class="xp-bar-bg"><div id="xp-fill" class="xp-bar-fill"></div></div>
+            <div id="complete-btn" class="mc-button disabled">取引完了 (待機中)</div>
         </div>
     </div>
 
-    <div class="mc-hotbar">
-        <div class="hotbar-slot active">
-            <img src="https://minecraft.wiki/images/Grass_Block_JE7_BE6.png" title="Home">
-        </div>
-        <div class="hotbar-slot">
-            <img src="https://minecraft.wiki/images/Compass_JE3_BE3.gif" title="Search">
-        </div>
-        <div class="hotbar-slot">
-            <img src="https://minecraft.wiki/images/Book_and_Quill_JE2_BE2.png" title="Post">
-        </div>
-        <div class="hotbar-slot">
-            <img src="https://minecraft.wiki/images/Experience_Bottle_JE2_BE2.png" title="History">
-        </div>
-        <div class="hotbar-slot">
-            <img src="https://mc-heads.net/avatar/Ifuto/32" title="Profile">
+    <div id="page-post" class="page">
+        <h2 style="color: var(--mc-gold); text-shadow: var(--mc-text-shadow);">NEW LISTING</h2>
+        <div class="mc-card">
+            <label style="font-size: 10px;">ITEM NAME</label>
+            <input type="text" placeholder="例: ダイヤモンド x64">
+            <label style="font-size: 10px;">PRICE ($)</label>
+            <input type="number" placeholder="1000">
+            <div class="mc-button" style="background-color: #55ff55; color: #000;" onclick="alert('出品しました！'); navigate('home')">LIST ITEM</div>
         </div>
     </div>
 
+    <div id="page-report" class="page">
+        <h2 style="color: var(--mc-danger); text-shadow: var(--mc-text-shadow);">REPORT SCAM</h2>
+        <div class="mc-card" style="background-color: #2a0000; color: #ff5555; border-color: #ff5555;">
+            <p style="font-size: 10px;">証拠画像をアップロードしてください(SS/キルログ)</p>
+            <input type="file" style="font-size: 10px;">
+            <textarea rows="4" placeholder="状況を詳しく説明してください..."></textarea>
+            <div class="mc-button" style="background-color: var(--mc-danger);" onclick="alert('通報を送信しました。'); navigate('home')">SEND REPORT</div>
+        </div>
+    </div>
+
+    <div id="page-profile" class="page">
+        <h2 style="color: var(--mc-gold); text-shadow: var(--mc-text-shadow);">YOUR PROFILE</h2>
+        <div class="mc-card">
+            <div style="display: flex; gap: 15px; align-items: center;">
+                <img src="https://mc-heads.net/avatar/Ifuto/48" style="border: 3px solid #555;">
+                <div>
+                    <div style="font-size: 16px; font-weight: bold;">Ifuto</div>
+                    <div style="font-size: 10px; color: #00aa00;">TRUSTED USER</div>
+                </div>
+            </div>
+            <hr style="border: 1px solid #555; margin: 15px 0;">
+            <p style="font-size: 12px;">取引完了: 142件</p>
+            <p style="font-size: 12px;">信頼スコア: 92%</p>
+            <div class="mc-button" style="margin-top: 10px;">ログアウト</div>
+        </div>
+    </div>
+
+    <nav class="mc-hotbar">
+        <div class="hotbar-slot active" onclick="navigate('home', this)">
+            <img src="https://minecraft.wiki/images/Grass_Block_JE7_BE6.png">
+        </div>
+        <div class="hotbar-slot" onclick="navigate('post', this)">
+            <img src="https://minecraft.wiki/images/Book_and_Quill_JE2_BE2.png">
+        </div>
+        <div class="hotbar-slot" onclick="navigate('report', this)">
+            <img src="https://minecraft.wiki/images/Barrier_JE2_BE2.png">
+        </div>
+        <div class="hotbar-slot" onclick="navigate('profile', this)">
+            <img src="https://mc-heads.net/avatar/Ifuto/32">
+        </div>
+    </nav>
+
+    <script>
+        // ページ切り替えロジック
+        function navigate(pageId, element) {
+            // 全ページを非表示
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            // 指定ページを表示
+            document.getElementById('page-' + pageId).classList.add('active');
+
+            // ホットバーのactive表示を更新
+            if (element) {
+                document.querySelectorAll('.hotbar-slot').forEach(s => s.classList.remove('active'));
+                element.classList.add('active');
+            }
+
+            // 取引詳細ページならタイマー開始
+            if (pageId === 'item-detail') {
+                startTimer(600); // 10分
+            }
+        }
+
+        // タイマーロジック（仕様書の10分制限）
+        let timerInterval;
+        function startTimer(seconds) {
+            clearInterval(timerInterval);
+            let timeLeft = seconds;
+            const timerText = document.getElementById('timer-text');
+            const xpFill = document.getElementById('xp-fill');
+            const btn = document.getElementById('complete-btn');
+
+            timerInterval = setInterval(() => {
+                const mins = Math.floor(timeLeft / 60);
+                const secs = timeLeft % 60;
+                timerText.innerText = `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+                
+                // プログレスバー更新
+                const percent = ((seconds - timeLeft) / seconds) * 100;
+                xpFill.style.width = percent + '%';
+
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    btn.classList.remove('disabled');
+                    btn.innerText = '取引を完了する';
+                    btn.onclick = () => { alert('取引が正常に完了しました！'); navigate('home'); };
+                }
+                timeLeft--;
+            }, 1000);
+        }
+    </script>
 </body>
 </html>
