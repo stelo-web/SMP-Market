@@ -1,107 +1,289 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-<meta charset="UTF-8">
-<title>SMP Market</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Donut Exchange | Minecraft Marketplace</title>
+    <style>
+        /* --- Minecraft Theme Core --- */
+        @font-face {
+            font-family: 'Minecraftia';
+            src: url('https://db.onlinewebfonts.com/t/6ab5395e206086782216174a7f058079.ttf') format('truetype');
+        }
 
-<style>
-body {
-  margin: 0;
-  font-family: Arial, sans-serif;
-  background: #0f172a;
-  color: white;
-}
+        :root {
+            --mc-bg: #48494a;
+            --mc-panel: #c6c6c6;
+            --mc-panel-shadow: #555555;
+            --mc-panel-light: #ffffff;
+            --mc-button: #a8a8a8;
+            --mc-button-border-dark: #5a5a5a;
+            --mc-button-hover: #7b8aff;
+            --mc-text-shadow: 2px 2px 0px #3f3f3f;
+            --mc-danger: #ff5555;
+            --mc-gold: #ffaa00;
+        }
 
-/* ヘッダー */
-header {
-  padding: 20px;
-  font-size: 20px;
-  font-weight: bold;
-  background: rgba(255,255,255,0.05);
-  backdrop-filter: blur(10px);
-}
+        * {
+            box-sizing: border-box;
+            image-rendering: pixelated;
+        }
 
-/* グリッド */
-.container {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  gap: 15px;
-  padding: 20px;
-}
+        body {
+            background-color: #1a1a1a;
+            background-image: url('https://www.transparenttextures.com/patterns/dark-matter.png'); /* Dirt/Stone base */
+            color: white;
+            font-family: 'Minecraftia', 'MS Gothic', sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
 
-/* カード */
-.card {
-  background: rgba(255,255,255,0.06);
-  border-radius: 12px;
-  padding: 15px;
-  transition: 0.2s;
-  cursor: pointer;
-  border: 1px solid rgba(255,255,255,0.08);
-}
+        /* --- UI Components --- */
+        .mc-container {
+            width: 100%;
+            max-width: 500px;
+            padding: 20px;
+            padding-bottom: 100px;
+        }
 
-.card:hover {
-  transform: translateY(-5px);
-  background: rgba(56,189,248,0.15);
-  border-color: #38bdf8;
-}
+        .mc-header {
+            text-align: center;
+            margin-bottom: 20px;
+            border-bottom: 4px solid var(--mc-panel-shadow);
+            padding-bottom: 10px;
+        }
 
-/* ボタン */
-button {
-  margin-top: 10px;
-  padding: 8px 12px;
-  border: none;
-  border-radius: 8px;
-  background: #38bdf8;
-  color: black;
-  font-weight: bold;
-  cursor: pointer;
-}
+        .mc-title {
+            font-size: 24px;
+            color: var(--mc-gold);
+            text-shadow: var(--mc-text-shadow);
+            margin: 0;
+        }
 
-button:hover {
-  opacity: 0.85;
-}
-</style>
+        /* 信頼スコアセクション */
+        .mc-card {
+            background-color: var(--mc-panel);
+            border: 4px solid;
+            border-color: var(--mc-panel-light) var(--mc-panel-shadow) var(--mc-panel-shadow) var(--mc-panel-light);
+            padding: 15px;
+            color: #373737;
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .mc-card-title {
+            margin: 0 0 10px 0;
+            font-size: 14px;
+            text-decoration: underline;
+        }
+
+        /* ボタン */
+        .mc-button {
+            display: block;
+            width: 100%;
+            background-color: var(--mc-button);
+            border: 3px solid;
+            border-color: var(--mc-panel-light) var(--mc-button-border-dark) var(--mc-button-border-dark) var(--mc-panel-light);
+            padding: 10px;
+            color: white;
+            text-align: center;
+            text-shadow: var(--mc-text-shadow);
+            cursor: pointer;
+            margin-bottom: 10px;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        .mc-button:hover {
+            background-color: var(--mc-button-hover);
+            border-color: #c6c6c6 #2a2a2a #2a2a2a #c6c6c6;
+        }
+
+        .mc-button.disabled {
+            filter: grayscale(1);
+            cursor: not-allowed;
+            color: #888;
+        }
+
+        /* アイテムスロット */
+        .item-slot {
+            display: flex;
+            background-color: #8b8b8b;
+            border: 4px solid #373737;
+            border-right-color: #ffffff;
+            border-bottom-color: #ffffff;
+            margin-bottom: 10px;
+            padding: 10px;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .item-icon {
+            width: 48px;
+            height: 48px;
+            background-color: #484848;
+            border: 2px solid #222;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .item-info h4 {
+            margin: 0;
+            font-size: 14px;
+            color: white;
+            text-shadow: 2px 2px 0 #000;
+        }
+
+        .price {
+            color: #55ff55;
+            text-shadow: 2px 2px 0 #00aa00;
+            font-size: 16px;
+        }
+
+        /* 詐欺師アラート */
+        .danger-alert {
+            border: 4px solid var(--mc-danger);
+            background-color: #2a0000;
+            color: var(--mc-danger);
+            padding: 10px;
+            font-size: 12px;
+            margin-top: 10px;
+        }
+
+        /* 下部ナビゲーション（Hotbar風） */
+        .mc-hotbar {
+            position: fixed;
+            bottom: 10px;
+            background-color: rgba(0,0,0,0.5);
+            display: flex;
+            padding: 5px;
+            border: 4px solid #111;
+            gap: 5px;
+        }
+
+        .hotbar-slot {
+            width: 50px;
+            height: 50px;
+            background-color: #8b8b8b;
+            border: 4px solid #373737;
+            border-right-color: #ffffff;
+            border-bottom-color: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+
+        .hotbar-slot.active {
+            border: 4px solid white;
+            box-shadow: 0 0 10px white;
+            z-index: 10;
+        }
+
+        .hotbar-slot img {
+            width: 32px;
+            height: 32px;
+        }
+
+        /* 進行状況バー */
+        .progress-bg {
+            background-color: #222;
+            height: 20px;
+            border: 2px solid #555;
+            margin: 10px 0;
+        }
+
+        .progress-fill {
+            background-color: #55ff55;
+            height: 100%;
+            width: 30%;
+        }
+
+    </style>
 </head>
-
 <body>
 
-<header>
-SMP Market
-</header>
+    <div class="mc-container">
+        <div class="mc-header">
+            <h1 class="mc-title">DONUT EXCHANGE</h1>
+            <p style="font-size: 10px; color: #aaa;">Signed in as Ifuto</p>
+        </div>
 
-<div class="container">
+        <div class="mc-card">
+            <h3 class="mc-card-title">STATUS: TRUSTED</h3>
+            <div style="display: flex; justify-content: space-between;">
+                <span>SCORE: <span style="color: #00aa00;">92%</span></span>
+                <span>UUID: <span style="color: #5555ff;">VALID</span></span>
+            </div>
+            <div class="danger-alert" style="border-color: #ffaa00; color: #ffaa00; background: #2a1a00;">
+                ⚠ Caution: 詐欺申請が1件進行中
+            </div>
+        </div>
 
-  <div class="card" onclick="playClick()">
-    <h3>Diamond Sword</h3>
-    <p>Price: 1200 coins</p>
-    <p>Seller: Steve</p>
-    <button onclick="buy(event)">Buy</button>
-  </div>
+        <h3 style="text-shadow: var(--mc-text-shadow); font-size: 16px;">[ 最新の出品 ]</h3>
+        
+        <div class="item-slot">
+            <div class="item-icon">
+                <img src="https://minecraft.wiki/images/Netherite_Ingot_JE2_BE2.png" width="32">
+            </div>
+            <div class="item-info">
+                <h4>Netherite Ingot x64</h4>
+                <div class="price">$1,200,000</div>
+                <div style="font-size: 10px; color: #ccc;">Seller: Steve_Mine</div>
+            </div>
+        </div>
 
-  <div class="card" onclick="playClick()">
-    <h3>Netherite Armor</h3>
-    <p>Price: 5000 coins</p>
-    <p>Seller: Alex</p>
-    <button onclick="buy(event)">Buy</button>
-  </div>
+        <div class="item-slot" style="background-color: #4a1a1a; border-color: #ff5555;">
+            <div class="item-icon" style="background-color: #2a0000;">
+                <img src="https://minecraft.wiki/images/Enchanted_Golden_Apple_JE2_BE2.gif" width="32">
+            </div>
+            <div class="item-info">
+                <h4 style="color: var(--mc-danger);">Special Danger Person</h4>
+                <div class="price" style="color: #888; text-decoration: line-through;">$50,000</div>
+                <div style="font-size: 10px; color: #ff5555;">Warning: リスク高</div>
+            </div>
+        </div>
 
-</div>
+        <div class="mc-card" style="margin-top: 30px; background-color: #333; color: white; border-color: #555 #111 #111 #555;">
+            <h3 style="text-align: center; font-size: 14px;">取引プロトコル進行中</h3>
+            <div style="display: flex; justify-content: space-around; margin: 15px 0;">
+                <img src="https://mc-heads.net/avatar/Ifuto/40" style="border: 2px solid white;">
+                <span style="font-size: 20px;">➡</span>
+                <img src="https://mc-heads.net/avatar/Alex/40" style="border: 2px solid white;">
+            </div>
+            <p style="font-size: 10px; text-align: center;">完了ボタン有効化まであと 8:42</p>
+            <div class="progress-bg">
+                <div class="progress-fill"></div>
+            </div>
+            <div class="mc-button disabled">取引完了 (待機中)</div>
+        </div>
 
-<audio id="clickSound" src="click.mp3"></audio>
+        <div class="mc-button" style="background-color: #ff5555; margin-top: 10px;">
+            詐欺被害を報告する
+        </div>
+    </div>
 
-<script>
-function playClick(){
-  const sound = document.getElementById("clickSound");
-  sound.currentTime = 0;
-  sound.play();
-}
-
-function buy(e){
-  e.stopPropagation();
-  playClick();
-  alert("Transaction started");
-}
-</script>
+    <div class="mc-hotbar">
+        <div class="hotbar-slot active">
+            <img src="https://minecraft.wiki/images/Grass_Block_JE7_BE6.png" title="Home">
+        </div>
+        <div class="hotbar-slot">
+            <img src="https://minecraft.wiki/images/Compass_JE3_BE3.gif" title="Search">
+        </div>
+        <div class="hotbar-slot">
+            <img src="https://minecraft.wiki/images/Book_and_Quill_JE2_BE2.png" title="Post">
+        </div>
+        <div class="hotbar-slot">
+            <img src="https://minecraft.wiki/images/Experience_Bottle_JE2_BE2.png" title="History">
+        </div>
+        <div class="hotbar-slot">
+            <img src="https://mc-heads.net/avatar/Ifuto/32" title="Profile">
+        </div>
+    </div>
 
 </body>
 </html>
