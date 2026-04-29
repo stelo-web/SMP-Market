@@ -3,226 +3,368 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Donut Exchange | Minecraft Market</title>
+    <title>MC Identity Monitor Pro</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* --- Minecraft Theme Core --- */
-        @font-face {
-            font-family: 'Minecraftia';
-            src: url('https://db.onlinewebfonts.com/t/6ab5395e206086782216174a7f058079.ttf') format('truetype');
-        }
-
         :root {
-            --mc-bg: #1a1a1a;
-            --mc-panel: #c6c6c6;
-            --mc-panel-shadow: #555555;
-            --mc-panel-light: #ffffff;
-            --mc-button: #a8a8a8;
-            --mc-button-border-dark: #5a5a5a;
-            --mc-button-hover: #7b8aff;
-            --mc-text-shadow: 2px 2px 0px #3f3f3f;
-            --mc-danger: #ff5555;
-            --mc-gold: #ffaa00;
+            --bg: #0f0f0f;
+            --card-bg: #1a1a1a;
+            --accent: #00ff88;
+            --accent-bedrock: #00d2ff;
+            --text: #e0e0e0;
+            --text-dim: #888;
+            --danger: #ff4757;
+            --border: #333;
         }
 
-        * { box-sizing: border-box; image-rendering: pixelated; }
         body {
-            background-color: var(--mc-bg);
-            background-image: url('https://www.transparenttextures.com/patterns/dark-matter.png');
-            color: white;
-            font-family: 'Minecraftia', sans-serif;
-            margin: 0;
-            overflow-x: hidden;
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
             display: flex;
             flex-direction: column;
             align-items: center;
-            min-height: 100vh;
+            padding: 40px 20px;
+            margin: 0;
         }
 
-        /* --- Layout --- */
-        .page { display: none; width: 100%; max-width: 500px; padding: 20px 20px 120px 20px; animation: fadeIn 0.2s; }
-        .page.active { display: block; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-
-        /* --- MC Components --- */
-        .mc-card {
-            background-color: var(--mc-panel);
-            border: 4px solid;
-            border-color: var(--mc-panel-light) var(--mc-panel-shadow) var(--mc-panel-shadow) var(--mc-panel-light);
-            padding: 15px; color: #373737; margin-bottom: 20px;
+        /* コンテナ設計 */
+        .container {
+            width: 100%;
+            max-width: 500px;
         }
 
-        .mc-button {
-            display: block; width: 100%; background-color: var(--mc-button);
-            border: 3px solid; border-color: var(--mc-panel-light) var(--mc-button-border-dark) var(--mc-button-border-dark) var(--mc-panel-light);
-            padding: 12px; color: white; text-align: center; text-shadow: var(--mc-text-shadow);
-            cursor: pointer; margin-bottom: 10px; font-size: 14px; text-decoration: none;
-        }
-        .mc-button:active { border-color: var(--mc-button-border-dark) var(--mc-panel-light) var(--mc-panel-light) var(--mc-button-border-dark); }
-        .mc-button.disabled { filter: grayscale(1); cursor: not-allowed; color: #888; }
-
-        .item-slot {
-            background-color: #8b8b8b; border: 4px solid #373737; border-right-color: #ffffff; border-bottom-color: #ffffff;
-            margin-bottom: 10px; padding: 10px; display: flex; align-items: center; gap: 15px; cursor: pointer;
+        .card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 30px;
+            border: 1px solid var(--border);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+            margin-bottom: 24px;
         }
 
-        /* --- Navigation --- */
-        .mc-hotbar {
-            position: fixed; bottom: 15px; background-color: rgba(0,0,0,0.6);
-            display: flex; padding: 4px; border: 4px solid #111; gap: 4px; z-index: 100;
+        h1 {
+            font-size: 22px;
+            margin: 0 0 24px 0;
+            text-align: center;
+            letter-spacing: 2px;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
         }
-        .hotbar-slot {
-            width: 44px; height: 44px; background-color: #8b8b8b; border: 4px solid #373737;
-            border-right-color: #ffffff; border-bottom-color: #ffffff;
-            display: flex; align-items: center; justify-content: center; cursor: pointer;
-        }
-        .hotbar-slot.active { border: 4px solid white; outline: 2px solid #000; z-index: 10; }
-        .hotbar-slot img { width: 28px; height: 28px; }
 
-        /* --- Progress Bar --- */
-        .xp-bar-bg { background-color: #222; height: 12px; border: 2px solid #555; margin: 10px 0; }
-        .xp-bar-fill { background-color: #55ff55; height: 100%; width: 0%; transition: width 1s linear; }
-
-        input, textarea {
-            width: 100%; background: #000; border: 2px solid #555; color: #55ff55;
-            padding: 10px; font-family: 'Minecraftia'; margin-bottom: 15px;
+        /* 検索セクション */
+        .search-box {
+            position: relative;
+            margin-bottom: 20px;
         }
+
+        input {
+            width: 100%;
+            padding: 16px 45px 16px 16px;
+            background: #000;
+            border: 1px solid var(--border);
+            color: #fff;
+            border-radius: 12px;
+            font-size: 16px;
+            box-sizing: border-box;
+            outline: none;
+            transition: border 0.3s, box-shadow 0.3s;
+        }
+
+        input:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 2px rgba(0, 255, 136, 0.2);
+        }
+
+        .search-btn {
+            width: 100%;
+            padding: 16px;
+            background: var(--accent);
+            color: #000;
+            border: none;
+            border-radius: 12px;
+            font-weight: 800;
+            font-size: 16px;
+            cursor: pointer;
+            transition: 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .search-btn:hover { transform: translateY(-2px); filter: brightness(1.1); }
+        .search-btn:active { transform: translateY(0); }
+
+        /* 結果表示エリア */
+        #result-area { display: none; animation: fadeIn 0.4s ease; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .player-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .face-preview {
+            width: 64px;
+            height: 64px;
+            border-radius: 8px;
+            background: #333;
+            image-rendering: pixelated;
+            border: 2px solid var(--border);
+        }
+
+        .badge {
+            font-size: 10px;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-weight: bold;
+            text-transform: uppercase;
+            margin-bottom: 4px;
+            display: inline-block;
+        }
+
+        .badge-java { background: var(--accent); color: #000; }
+        .badge-bedrock { background: var(--accent-bedrock); color: #000; }
+
+        .info-row {
+            margin-bottom: 15px;
+        }
+
+        .info-label { font-size: 11px; color: var(--text-dim); text-transform: uppercase; margin-bottom: 4px; }
+        
+        .clickable-value {
+            background: #0a0a0a;
+            padding: 12px;
+            border-radius: 8px;
+            font-family: 'Consolas', monospace;
+            font-size: 14px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            border: 1px solid transparent;
+            transition: 0.2s;
+        }
+
+        .clickable-value:hover { border-color: var(--accent); background: #111; }
+        .clickable-value i { color: var(--text-dim); font-size: 12px; }
+
+        /* 履歴・アラート */
+        .history-section {
+            background: #000;
+            border-radius: 12px;
+            padding: 16px;
+            margin-top: 20px;
+        }
+
+        .history-tag {
+            display: inline-block;
+            background: #222;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 12px;
+            margin-right: 8px;
+            margin-bottom: 8px;
+            color: var(--accent-bedrock);
+        }
+
+        .alert-banner {
+            background: rgba(255, 71, 87, 0.15);
+            border: 1px solid var(--danger);
+            color: var(--danger);
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 13px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* 全体ログ表示 */
+        .global-logs {
+            width: 100%;
+            max-width: 500px;
+        }
+
+        .log-card {
+            background: #111;
+            border: 1px solid var(--border);
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            font-size: 12px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        /* トースト通知 */
+        #toast {
+            position: fixed;
+            top: 20px;
+            background: var(--accent);
+            color: #000;
+            padding: 12px 24px;
+            border-radius: 30px;
+            font-weight: bold;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+            display: none;
+            z-index: 1000;
+            animation: slideDown 0.3s ease;
+        }
+
+        @keyframes slideDown { from { transform: translateY(-50px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
     </style>
 </head>
 <body>
 
-    <div id="page-home" class="page active">
-        <h2 style="color: var(--mc-gold); text-shadow: var(--mc-text-shadow);">MARKET LIST</h2>
-        <div class="item-slot" onclick="navigate('item-detail')">
-            <img src="https://minecraft.wiki/images/Netherite_Ingot_JE2_BE2.png" width="32">
-            <div>
-                <div style="font-size: 12px;">Netherite Ingot x64</div>
-                <div style="color: #55ff55;">$1,200,000</div>
-            </div>
-        </div>
-        <div class="item-slot" style="background-color: #4a1a1a;" onclick="alert('特別危険人物です。注意してください。'); navigate('item-detail')">
-            <img src="https://minecraft.wiki/images/Enchanted_Golden_Apple_JE2_BE2.gif" width="32">
-            <div>
-                <div style="font-size: 12px; color: var(--mc-danger);">Suspicious Apple</div>
-                <div style="color: #888; text-decoration: line-through;">$50,000</div>
-            </div>
-        </div>
-    </div>
+<div id="toast">Copied to clipboard!</div>
 
-    <div id="page-item-detail" class="page">
-        <div class="mc-button" style="width: 80px; margin-bottom: 20px;" onclick="navigate('home')">← BACK</div>
-        <div class="mc-card">
-            <h3 style="margin-top:0">TRANSACTION</h3>
-            <div style="display: flex; justify-content: space-between; align-items: center; margin: 20px 0;">
-                <img src="https://mc-heads.net/avatar/Ifuto/40" style="border: 2px solid #555;">
-                <span style="font-size: 20px;">➡</span>
-                <img src="https://mc-heads.net/avatar/Alex/40" style="border: 2px solid #555;">
-            </div>
-            <p style="font-size: 10px; text-align: center;">完了ボタン有効まで: <span id="timer-text">10:00</span></p>
-            <div class="xp-bar-bg"><div id="xp-fill" class="xp-bar-fill"></div></div>
-            <div id="complete-btn" class="mc-button disabled">取引完了 (待機中)</div>
+<div class="container">
+    <div class="card">
+        <h1><i class="fa-solid fa-shield-halved"></i> ID MONITOR PRO</h1>
+        
+        <div class="search-box">
+            <input type="text" id="mcid" placeholder="Username (Prefix . for Bedrock)" onkeypress="if(event.key==='Enter') search()">
         </div>
-    </div>
+        <button class="search-btn" onclick="search()" id="search-btn">
+            <i class="fa-solid fa-magnifying-glass"></i> CHECK IDENTITY
+        </button>
 
-    <div id="page-post" class="page">
-        <h2 style="color: var(--mc-gold); text-shadow: var(--mc-text-shadow);">NEW LISTING</h2>
-        <div class="mc-card">
-            <label style="font-size: 10px;">ITEM NAME</label>
-            <input type="text" placeholder="例: ダイヤモンド x64">
-            <label style="font-size: 10px;">PRICE ($)</label>
-            <input type="number" placeholder="1000">
-            <div class="mc-button" style="background-color: #55ff55; color: #000;" onclick="alert('出品しました！'); navigate('home')">LIST ITEM</div>
-        </div>
-    </div>
+        <div id="result-area">
+            <div id="alert-container"></div>
 
-    <div id="page-report" class="page">
-        <h2 style="color: var(--mc-danger); text-shadow: var(--mc-text-shadow);">REPORT SCAM</h2>
-        <div class="mc-card" style="background-color: #2a0000; color: #ff5555; border-color: #ff5555;">
-            <p style="font-size: 10px;">証拠画像をアップロードしてください(SS/キルログ)</p>
-            <input type="file" style="font-size: 10px;">
-            <textarea rows="4" placeholder="状況を詳しく説明してください..."></textarea>
-            <div class="mc-button" style="background-color: var(--mc-danger);" onclick="alert('通報を送信しました。'); navigate('home')">SEND REPORT</div>
-        </div>
-    </div>
-
-    <div id="page-profile" class="page">
-        <h2 style="color: var(--mc-gold); text-shadow: var(--mc-text-shadow);">YOUR PROFILE</h2>
-        <div class="mc-card">
-            <div style="display: flex; gap: 15px; align-items: center;">
-                <img src="https://mc-heads.net/avatar/Ifuto/48" style="border: 3px solid #555;">
+            <div class="player-header">
+                <img id="face-img" src="" class="face-preview" alt="Face">
                 <div>
-                    <div style="font-size: 16px; font-weight: bold;">Ifuto</div>
-                    <div style="font-size: 10px; color: #00aa00;">TRUSTED USER</div>
+                    <div id="type-badge" class="badge"></div>
+                    <div id="display-name" style="font-size: 20px; font-weight: bold;"></div>
                 </div>
             </div>
-            <hr style="border: 1px solid #555; margin: 15px 0;">
-            <p style="font-size: 12px;">取引完了: 142件</p>
-            <p style="font-size: 12px;">信頼スコア: 92%</p>
-            <div class="mc-button" style="margin-top: 10px;">ログアウト</div>
+
+            <div class="info-row">
+                <div class="info-label">Current Identifier</div>
+                <div class="clickable-value" onclick="copy(this.innerText)">
+                    <span id="res-id"></span>
+                    <i class="fa-regular fa-copy"></i>
+                </div>
+            </div>
+
+            <div class="history-section">
+                <div class="info-label" style="margin-bottom: 10px;">Name History</div>
+                <div id="res-history"></div>
+            </div>
         </div>
     </div>
 
-    <nav class="mc-hotbar">
-        <div class="hotbar-slot active" onclick="navigate('home', this)">
-            <img src="https://minecraft.wiki/images/Grass_Block_JE7_BE6.png">
+    <div class="global-logs">
+        <div style="font-size: 12px; color: var(--text-dim); margin-bottom: 10px; text-transform: uppercase; letter-spacing: 1px;">
+            <i class="fa-solid fa-list-ul"></i> Global Change Logs
         </div>
-        <div class="hotbar-slot" onclick="navigate('post', this)">
-            <img src="https://minecraft.wiki/images/Book_and_Quill_JE2_BE2.png">
-        </div>
-        <div class="hotbar-slot" onclick="navigate('report', this)">
-            <img src="https://minecraft.wiki/images/Barrier_JE2_BE2.png">
-        </div>
-        <div class="hotbar-slot" onclick="navigate('profile', this)">
-            <img src="https://mc-heads.net/avatar/Ifuto/32">
-        </div>
-    </nav>
+        <div id="global-log-container">
+            </div>
+    </div>
+</div>
 
-    <script>
-        // ページ切り替えロジック
-        function navigate(pageId, element) {
-            // 全ページを非表示
-            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-            // 指定ページを表示
-            document.getElementById('page-' + pageId).classList.add('active');
+<script>
+    // WorkerのURLをここに
+    const API_BASE = "https://your-worker-url.workers.dev";
 
-            // ホットバーのactive表示を更新
-            if (element) {
-                document.querySelectorAll('.hotbar-slot').forEach(s => s.classList.remove('active'));
-                element.classList.add('active');
+    async function search() {
+        const mcid = document.getElementById('mcid').value.trim();
+        const btn = document.getElementById('search-btn');
+        if(!mcid) return;
+
+        // UI Loading State
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> ANALYZING...';
+        
+        try {
+            const res = await fetch(`${API_BASE}?mcid=${encodeURIComponent(mcid)}`);
+            const data = await res.json();
+
+            if(data.error) throw new Error(data.error);
+
+            // 表示処理
+            document.getElementById('result-area').style.display = "block";
+            document.getElementById('display-name').innerText = data.name;
+            document.getElementById('res-id').innerText = data.id;
+            
+            // バッジ & 顔画像
+            const badge = document.getElementById('type-badge');
+            const face = document.getElementById('face-img');
+            if(data.type === "Bedrock") {
+                badge.innerText = "Bedrock Edition";
+                badge.className = "badge badge-bedrock";
+                // 統合版はSteveを表示（またはXUID対応APIがあれば差し替え）
+                face.src = `https://mc-heads.net/avatar/steve/64`;
+            } else {
+                badge.innerText = "Java Edition";
+                badge.className = "badge badge-java";
+                face.src = `https://mc-heads.net/avatar/${data.id}/64`;
             }
 
-            // 取引詳細ページならタイマー開始
-            if (pageId === 'item-detail') {
-                startTimer(600); // 10分
+            // 改名アラート
+            const alertCont = document.getElementById('alert-container');
+            if(data.changeLog) {
+                alertCont.innerHTML = `<div class="alert-banner"><i class="fa-solid fa-triangle-exclamation"></i> ${data.changeLog}</div>`;
+            } else {
+                alertCont.innerHTML = "";
             }
+
+            // 履歴タグ
+            const histCont = document.getElementById('res-history');
+            histCont.innerHTML = data.history.map(h => `<span class="history-tag">${h}</span>`).join('');
+
+            // 全体ログの更新（もしWorkerが全体ログを返せるならここで）
+            updateGlobalLogs();
+
+        } catch (e) {
+            alert("Player not found in database.");
+        } finally {
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fa-solid fa-magnifying-glass"></i> CHECK IDENTITY';
         }
+    }
 
-        // タイマーロジック（仕様書の10分制限）
-        let timerInterval;
-        function startTimer(seconds) {
-            clearInterval(timerInterval);
-            let timeLeft = seconds;
-            const timerText = document.getElementById('timer-text');
-            const xpFill = document.getElementById('xp-fill');
-            const btn = document.getElementById('complete-btn');
-
-            timerInterval = setInterval(() => {
-                const mins = Math.floor(timeLeft / 60);
-                const secs = timeLeft % 60;
-                timerText.innerText = `${mins}:${secs < 10 ? '0' : ''}${secs}`;
-                
-                // プログレスバー更新
-                const percent = ((seconds - timeLeft) / seconds) * 100;
-                xpFill.style.width = percent + '%';
-
-                if (timeLeft <= 0) {
-                    clearInterval(timerInterval);
-                    btn.classList.remove('disabled');
-                    btn.innerText = '取引を完了する';
-                    btn.onclick = () => { alert('取引が正常に完了しました！'); navigate('home'); };
-                }
-                timeLeft--;
-            }, 1000);
+    // 全体ログ取得（ダミー実装：Workerに ?action=get_logs エンドポイントがある前提）
+    async function updateGlobalLogs() {
+        try {
+            const res = await fetch(`${API_BASE}?action=get_logs`);
+            const logs = await res.json();
+            const container = document.getElementById('global-log-container');
+            container.innerHTML = logs.map(l => `
+                <div class="log-card">
+                    <span>${l.msg}</span>
+                    <span style="color:#555;">${l.time}</span>
+                </div>
+            `).join('');
+        } catch(e) {
+            console.log("No global logs available yet.");
         }
-    </script>
+    }
+
+    function copy(text) {
+        // 装飾（&bなど）を取り除いてコピーするか、そのままにするか選べますが、
+        // ここではIfutoさんの「コピーして使う」用途に合わせてそのままコピーします。
+        navigator.clipboard.writeText(text);
+        const toast = document.getElementById('toast');
+        toast.style.display = "block";
+        setTimeout(() => toast.style.display = "none", 2000);
+    }
+
+    // ページ読み込み時に全体ログを表示
+    updateGlobalLogs();
+</script>
+
 </body>
 </html>
